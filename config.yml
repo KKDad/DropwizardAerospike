@@ -1,0 +1,13 @@
+database:
+  driverClass: com.aerospike.jdbc.AerospikeDriver
+  url: jdbc:aerospike:127.0.0.1:3000/test
+  validationQuery: "select * from ns1 limit 1"
+
+logging:
+  level: INFO
+  loggers:
+    io.dropwizard.jersey.jackson.JsonProcessingExceptionMapper: DEBUG
+    com.aerospike.jdbc: WARN
+  appenders:
+    - type: console
+      #logFormat: "%yellow(%d{ISO8601}) %highlight(%-5level) [%white(%t)] %green(%logger{-20.20}): %m%n%boldRed(%ex{short})"

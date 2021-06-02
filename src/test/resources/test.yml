@@ -1,0 +1,13 @@
+aerospike:
+  host: 127.0.0.1
+  port: 3000
+  namespace: test
+  bucket: queries
+
+logging:
+  level: INFO
+  loggers:
+    io.dropwizard.jersey.jackson.JsonProcessingExceptionMapper: DEBUG
+    com.aerospike.jdbc: WARN
+  appenders:
+    - type: console
