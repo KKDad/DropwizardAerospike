@@ -114,24 +114,28 @@ task pullImagePresidioAnonymizer(type: DockerPullImage) {
 task createContainerAeroSpike(type: DockerCreateContainer) {
     dependsOn pullImageAeroSpike
     targetImageId "aerospike:$aeroSpikeVersion"
-    containerName = "aerospike"
-    hostConfig.portBindings  = ["3000:3000", "3001:3001", "3002:3002" ]
-    hostConfig.autoRemove = true
+    containerName.set("aerospike")
+    hostConfig.portBindings.add("3000:3000")
+    hostConfig.portBindings.add("3001:3002")
+    hostConfig.portBindings.add("3002:3002")
+    hostConfig.autoRemove.set(true)
     withEnvVar("NAMESPACE", "test")
 }
 task createContainerPresidioAnalyzer(type: DockerCreateContainer) {
     dependsOn pullImagePresidioAnalyzer
     targetImageId "mcr.microsoft.com/presidio-analyzer:$presidoVersion"
-    containerName = "presidio-analyzer"
-    hostConfig.portBindings  = ["5001:3000" ]
-    hostConfig.autoRemove = true
+    containerName.set("presidio-analyzer")
+    hostConfig.portBindings.add( "5001:3000")
+    exposePorts('tcp', [3000])
+    hostConfig.autoRemove.set(true)
 }
 task createContainerPresidioAnonymizer(type: DockerCreateContainer) {
     dependsOn pullImagePresidioAnonymizer
     targetImageId "mcr.microsoft.com/presidio-anonymizer:$presidoVersion"
-    containerName = "presidio-anonymizer"
-    hostConfig.portBindings  = ["5002:3000" ]
-    hostConfig.autoRemove = true
+    containerName.set("presidio-anonymizer")
+    hostConfig.portBindings.add( "5002:3000")
+    exposePorts('tcp', [3000])
+    hostConfig.autoRemove.set(true)
 }
 
 task start_aerospike(type: DockerStartContainer) {
@@ -182,9 +186,9 @@ task stop_presidio_anonymizer(type: DockerStopContainer) {
 task check_if_aerospike_running {
     def is_aerospike_present = get_port_status(3000)
     if (is_aerospike_present) {
-        logger.info("Using existing AeroSpike instance running on localhost:3000")
+        logger.warn("Using existing AeroSpike instance running on localhost:3000")
     } else {
-        logger.info("Starting an instance of AeroSpike on localhost:3000")
+        logger.warn("Starting an instance of AeroSpike on localhost:3000")
         test.dependsOn wait_aerospike_startup
         test.finalizedBy stop_presidio_anonymizer
     }
@@ -193,9 +197,9 @@ task check_if_aerospike_running {
 task check_if_presidio_running {
     def is_presidio_present = get_port_status(5001)
     if (is_presidio_present) {
-        logger.info("Using existing Presidio instance running on localhost:5001")
+        logger.warn("Using existing Presidio instance running on localhost:5001")
     } else {
-        logger.info("Starting an instance of Presidio Analyzer & Anonymizer on ports 5001 and 5002")
+        logger.warn("Starting an instance of Presidio Analyzer & Anonymizer on ports 5001 and 5002")
         test.dependsOn wait_presidio_startup
         test.finalizedBy stop_presidio_analyzer
         test.finalizedBy stop_presidio_anonymizer
