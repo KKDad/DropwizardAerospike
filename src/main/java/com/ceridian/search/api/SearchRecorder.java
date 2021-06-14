@@ -2,7 +2,7 @@ package com.ceridian.search.api;
 
 import com.ceridian.search.aerospike.DbException;
 import com.ceridian.search.aerospike.ISearchDao;
-import com.ceridian.search.models.SearchQuery;
+import com.ceridian.search.models.SearchQueryAnonymized;
 import com.codahale.metrics.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class SearchRecorder {
     @Timed
     @Path("/record/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public SearchQuery getQueryById(@NotNull @PathParam("id") UUID id) {
+    public SearchQueryAnonymized getQueryById(@NotNull @PathParam("id") UUID id) {
         try {
             return searchDao.retrieveQueryByKey(id);
         } catch (DbException e) {
@@ -39,7 +39,7 @@ public class SearchRecorder {
     @POST
     @Path("/record/")
     @Timed
-    public Response recordQuery(SearchQuery query, @Context UriInfo uriInfo) {
+    public Response recordQuery(SearchQueryAnonymized query, @Context UriInfo uriInfo) {
         try {
             query.searchId = UUID.randomUUID().toString();
             if (searchDao.recordQuery(query)) {

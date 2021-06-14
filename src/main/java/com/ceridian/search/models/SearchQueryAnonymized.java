@@ -9,7 +9,7 @@ import java.beans.ConstructorProperties;
 import java.time.LocalDateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SearchQuery {
+public class SearchQueryAnonymized {
 
     @JsonProperty("SearchID")
     public String searchId;
@@ -36,12 +36,12 @@ public class SearchQuery {
     @JsonProperty("Query")
     public String query;
 
-    public SearchQuery() { }
+    public SearchQueryAnonymized() { }
 
     @JdbiConstructor
     @ConstructorProperties({"searchid", "source", "timequery", "querytimems", "sessionid", "clientid", "userrole", "query"})
     @SuppressWarnings("java:S107")
-    public SearchQuery(String searchID, SourceType source, LocalDateTime timeQuery, Long queryTimeMS, String sessionID, long clientID, String userRole, String query) {
+    public SearchQueryAnonymized(String searchID, SourceType source, LocalDateTime timeQuery, Long queryTimeMS, String sessionID, long clientID, String userRole, String query) {
         this.searchId = searchID;
         this.source = source;
         this.timePerformed = timeQuery;

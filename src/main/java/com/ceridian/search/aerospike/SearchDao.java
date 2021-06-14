@@ -5,7 +5,7 @@ import com.aerospike.client.Bin;
 import com.aerospike.client.Key;
 import com.aerospike.client.Record;
 import com.ceridian.search.configuration.AerospikeConfiguration;
-import com.ceridian.search.models.SearchQuery;
+import com.ceridian.search.models.SearchQueryAnonymized;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -21,7 +21,7 @@ public class SearchDao implements ISearchDao {
     }
 
     @Override
-    public boolean recordQuery(SearchQuery searchQuery) {
+    public boolean recordQuery(SearchQueryAnonymized searchQuery) {
         var key = new Key(params.namespace, params.bucket, searchQuery.searchId);
         var binSearchId = new Bin("searchId", searchQuery.searchId);
         var binSource = new Bin("source", searchQuery.source);
@@ -38,16 +38,16 @@ public class SearchDao implements ISearchDao {
     }
 
     @Override
-    public SearchQuery retrieveQueryByKey(UUID id) throws DbException {
+    public SearchQueryAnonymized retrieveQueryByKey(UUID id) throws DbException {
         var key = new Key(params.namespace, params.bucket, id.toString());
 
         Record record = client.get(null, key);
         if (record == null || record.bins.size() == 0)
             throw new DbException("Record now located");
         try {
-            var searchQuery = new SearchQuery();
+            var searchQuery = new SearchQueryAnonymized();
             searchQuery.searchId = id.toString();
-            searchQuery.source = SearchQuery.SourceType.valueOf(record.bins.get("source").toString());
+            searchQuery.source = SearchQueryAnonymized.SourceType.valueOf(record.bins.get("source").toString());
             searchQuery.queryTimeMs = Long.parseLong(record.bins.get("queryTimeMs").toString());
             searchQuery.query = record.bins.get("query").toString();
             searchQuery.userRole = record.bins.get("userRole").toString();

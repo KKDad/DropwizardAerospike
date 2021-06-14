@@ -2,9 +2,7 @@ package com.ceridian.search.api;
 
 import com.ceridian.search.configuration.SearchAnonymizerConfiguration;
 import com.ceridian.search.main.SearchAnonymizerAPI;
-import com.ceridian.search.models.SearchQuery;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.ceridian.search.models.SearchQueryAnonymized;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -44,16 +42,16 @@ public class SearchRecorderTest
     void createUpdateSystemTemplate() {
         Client client = EXT.client();
 
-        SearchQuery query = new SearchQuery();
+        SearchQueryAnonymized query = new SearchQueryAnonymized();
         query.query = "Time away from Work";
         query.queryTimeMs = 40L;
         query.sessionId = UUID.randomUUID().toString();
         query.clientId = 10000L;
         query.timePerformed = LocalDateTime.of(2021, 02, 15, 1, 15, 00);
-        query.source = SearchQuery.SourceType.INTELLIGENT_SEARCH;
+        query.source = SearchQueryAnonymized.SourceType.INTELLIGENT_SEARCH;
         query.userRole = "ADMIN";
 
-        Entity<SearchQuery> entity = Entity.json(query);
+        Entity<SearchQueryAnonymized> entity = Entity.json(query);
         Response response = client.target(
                 String.format("http://localhost:%d/api/v1/query/record", EXT.getLocalPort()))
                 .request()

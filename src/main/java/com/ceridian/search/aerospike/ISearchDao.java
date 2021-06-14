@@ -1,11 +1,11 @@
 package com.ceridian.search.aerospike;
 
-import com.ceridian.search.models.SearchQuery;
+import com.ceridian.search.models.SearchQueryAnonymized;
 
 import java.util.UUID;
 
 public interface ISearchDao {
-    boolean recordQuery(SearchQuery searchQuery);
+    boolean recordQuery(SearchQueryAnonymized searchQuery);
 
-    SearchQuery retrieveQueryByKey(UUID id) throws DbException;
+    SearchQueryAnonymized retrieveQueryByKey(UUID id) throws DbException;
 }

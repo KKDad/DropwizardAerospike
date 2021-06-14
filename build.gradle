@@ -27,6 +27,7 @@ ext {
     junitJupiterVersion = '5.5.1'
     log4jVersion="2.13.3"
     mockitoVersion = '2.23.0'
+    presidoVersion = "latest"
 }
 
 dependencies {
@@ -74,46 +75,43 @@ tasks.withType(Test) {
 }
 
 /**************************************************************************************************************
-                Testing Helpers - Start/Stop Areospike when running integration tests
+                Testing Helpers
+                    - Start/Stop AeroSpike
+                    - Start/Stop Presidio-Analyzer
+                    - Start/Stop Presidio-Anonymizer
 /**************************************************************************************************************/
 import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
 import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
 import com.bmuschko.gradle.docker.tasks.container.DockerStopContainer
 import com.bmuschko.gradle.docker.tasks.image.DockerPullImage
 
-
-// Return true if AeroSpike is running on the localhost:3000 and is in  a green state
-static boolean get_areospike_status() {
-    ServerSocket ss = null;
-    DatagramSocket ds = null;
+static boolean get_port_status(int port) {
+    Socket s = null;
     try {
-        ss = new ServerSocket(3000);
-        ss.setReuseAddress(true);
-        ds = new DatagramSocket(3000);
-        ds.setReuseAddress(true);
+        s = new Socket("127.0.0.1", port);
         return true;
-    } catch (IOException ignored) {
-    } finally {
-        if (ds != null) {
-            ds.close();
-        }
-        if (ss != null) {
-            try {
-                ss.close();
-            } catch (IOException ignored) {
-                /* should not be thrown */
-            }
-        }
+    } catch (Exception e) {
+        return false;
     }
-    return false;
+    finally {
+        if(s != null)
+            try { s.close(); }
+            catch(Exception ignored){}
+    }
 }
 
 
 task pullImageAeroSpike(type: DockerPullImage) {
     image = "aerospike:$aeroSpikeVersion"
 }
+task pullImagePresidioAnalyzer(type: DockerPullImage) {
+    image = "mcr.microsoft.com/presidio-analyzer:$presidoVersion"
+}
+task pullImagePresidioAnonymizer(type: DockerPullImage) {
+    image = "mcr.microsoft.com/presidio-anonymizer:$presidoVersion"
+}
 
-task createContainer(type: DockerCreateContainer) {
+task createContainerAeroSpike(type: DockerCreateContainer) {
     dependsOn pullImageAeroSpike
     targetImageId "aerospike:$aeroSpikeVersion"
     containerName = "aerospike"
@@ -121,37 +119,90 @@ task createContainer(type: DockerCreateContainer) {
     hostConfig.autoRemove = true
     withEnvVar("NAMESPACE", "test")
 }
+task createContainerPresidioAnalyzer(type: DockerCreateContainer) {
+    dependsOn pullImagePresidioAnalyzer
+    targetImageId "mcr.microsoft.com/presidio-analyzer:$presidoVersion"
+    containerName = "presidio-analyzer"
+    hostConfig.portBindings  = ["5001:3000" ]
+    hostConfig.autoRemove = true
+}
+task createContainerPresidioAnonymizer(type: DockerCreateContainer) {
+    dependsOn pullImagePresidioAnonymizer
+    targetImageId "mcr.microsoft.com/presidio-anonymizer:$presidoVersion"
+    containerName = "presidio-anonymizer"
+    hostConfig.portBindings  = ["5002:3000" ]
+    hostConfig.autoRemove = true
+}
 
 task start_aerospike(type: DockerStartContainer) {
-    dependsOn createContainer
-    targetContainerId createContainer.getContainerId()
+    dependsOn createContainerAeroSpike
+    targetContainerId createContainerAeroSpike.getContainerId()
 }
+task start_presidioAnalyzer(type: DockerStartContainer) {
+    dependsOn createContainerPresidioAnalyzer
+    targetContainerId createContainerPresidioAnalyzer.getContainerId()
+}
+task start_presidioAnonymizer(type: DockerStartContainer) {
+    dependsOn createContainerPresidioAnonymizer
+    targetContainerId createContainerPresidioAnonymizer.getContainerId()
+}
+
 
 task wait_aerospike_startup {
     dependsOn start_aerospike
     doLast {
         timeout.set(Duration.ofMinutes(3))
         logger.info("Waiting for AeroSpike instance on localhost:3000")
-        while (!get_es_status())
+        while (!get_port_status(3000))
+            sleep(5 * 1000)
+    }
+}
+task wait_presidio_startup {
+    dependsOn start_presidioAnalyzer
+    dependsOn start_presidioAnonymizer
+    doLast {
+        timeout.set(Duration.ofMinutes(3))
+        logger.info("Waiting for Presidio instance on localhost:5001")
+        while (!get_port_status(5001))
             sleep(5 * 1000)
     }
 }
 
 task stop_aerospike(type: DockerStopContainer) {
-    targetContainerId createContainer.getContainerId()
+    targetContainerId createContainerAeroSpike.getContainerId()
+}
+task stop_presidio_analyzer(type: DockerStopContainer) {
+    targetContainerId createContainerPresidioAnalyzer.getContainerId()
+}
+task stop_presidio_anonymizer(type: DockerStopContainer) {
+    targetContainerId createContainerPresidioAnonymizer.getContainerId()
 }
 
+
 task check_if_aerospike_running {
-    def is_aerospike_present = get_areospike_status()
+    def is_aerospike_present = get_port_status(3000)
     if (is_aerospike_present) {
         logger.info("Using existing AeroSpike instance running on localhost:3000")
     } else {
-        integrationTest.dependsOn wait_aerospike_startup
-        integrationTest.finalizedBy stop_aerospike
+        logger.info("Starting an instance of AeroSpike on localhost:3000")
+        test.dependsOn wait_aerospike_startup
+        test.finalizedBy stop_presidio_anonymizer
     }
 }
-integrationTest.dependsOn check_if_aerospike_running
 
+task check_if_presidio_running {
+    def is_presidio_present = get_port_status(5001)
+    if (is_presidio_present) {
+        logger.info("Using existing Presidio instance running on localhost:5001")
+    } else {
+        logger.info("Starting an instance of Presidio Analyzer & Anonymizer on ports 5001 and 5002")
+        test.dependsOn wait_presidio_startup
+        test.finalizedBy stop_presidio_analyzer
+        test.finalizedBy stop_presidio_anonymizer
+    }
+}
+test.dependsOn check_if_aerospike_running
+test.dependsOn check_if_presidio_running
 
 
 /**************************************************************************************************************
