@@ -1,8 +1,6 @@
 package com.ceridian.search.utils;
 
 import com.ceridian.search.configuration.PresidioConfiguration;
-import com.ceridian.search.configuration.SearchAnonymizerConfiguration;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.dropwizard.testing.ResourceHelpers;
@@ -11,8 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class AnonymizerTest {
 
@@ -26,8 +22,9 @@ class AnonymizerTest {
 
             String query = "hello world, my name is Jane Doe. My number is: 034453334";
             Anonymizer subject = new Anonymizer(config);
-            String result = subject.Anonymize(query, "en");
+            String result = subject.anonymize(query, "en");
 
+            Assert.assertEquals("hello world, my name is <PERSON>. My number is: #########", result);
 
         } catch (AnonymizeException | IOException e) {
             Assert.fail(e.getLocalizedMessage());

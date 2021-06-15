@@ -8,4 +8,7 @@ public class AnalyzerConfiguration {
 
     @JsonProperty("port")
     public Integer port;
+
+    @JsonProperty("score_threshold")
+    public Double scoreThreshold;
 }

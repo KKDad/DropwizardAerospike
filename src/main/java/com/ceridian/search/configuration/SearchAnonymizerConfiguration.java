@@ -8,6 +8,6 @@ public class SearchAnonymizerConfiguration extends Configuration {
     @JsonProperty("aerospike")
     public AerospikeConfiguration aerospike;
 
-    @JsonProperty("presido")
+    @JsonProperty("presidio")
     public PresidioConfiguration presido;
 }

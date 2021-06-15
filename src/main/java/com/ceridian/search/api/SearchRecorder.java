@@ -44,7 +44,7 @@ public class SearchRecorder {
             query.searchId = UUID.randomUUID().toString();
             if (searchDao.recordQuery(query)) {
                 UriBuilder builder = uriInfo.getAbsolutePathBuilder();
-                builder.path(query.searchId.toString());
+                builder.path(query.searchId);
                 return Response.created(builder.build()).build();
             }
         } catch (Exception e) {

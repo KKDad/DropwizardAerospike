@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
-public class SearchRecorderTest
+class SearchRecorderTest
 {
     private static final Logger LOG = LoggerFactory.getLogger(SearchRecorderTest.class);
 

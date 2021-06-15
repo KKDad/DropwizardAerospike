@@ -3,7 +3,6 @@ package com.ceridian.search.aerospike;
 import com.aerospike.client.AerospikeClient;
 import com.aerospike.client.Bin;
 import com.aerospike.client.Key;
-import com.aerospike.client.Record;
 import com.ceridian.search.configuration.AerospikeConfiguration;
 import com.ceridian.search.models.SearchQueryAnonymized;
 
@@ -41,19 +40,19 @@ public class SearchDao implements ISearchDao {
     public SearchQueryAnonymized retrieveQueryByKey(UUID id) throws DbException {
         var key = new Key(params.namespace, params.bucket, id.toString());
 
-        Record record = client.get(null, key);
-        if (record == null || record.bins.size() == 0)
+        var aeroSpikeRecord = client.get(null, key);
+        if (aeroSpikeRecord == null || aeroSpikeRecord.bins.size() == 0)
             throw new DbException("Record now located");
         try {
             var searchQuery = new SearchQueryAnonymized();
             searchQuery.searchId = id.toString();
-            searchQuery.source = SearchQueryAnonymized.SourceType.valueOf(record.bins.get("source").toString());
-            searchQuery.queryTimeMs = Long.parseLong(record.bins.get("queryTimeMs").toString());
-            searchQuery.query = record.bins.get("query").toString();
-            searchQuery.userRole = record.bins.get("userRole").toString();
-            searchQuery.timePerformed = LocalDateTime.parse(record.bins.get("timePerformed").toString());
-            searchQuery.clientId = Long.parseLong(record.bins.get("clientId").toString());
-            searchQuery.sessionId = record.bins.get("sessionId").toString();
+            searchQuery.source = SearchQueryAnonymized.SourceType.valueOf(aeroSpikeRecord.bins.get("source").toString());
+            searchQuery.queryTimeMs = Long.parseLong(aeroSpikeRecord.bins.get("queryTimeMs").toString());
+            searchQuery.query = aeroSpikeRecord.bins.get("query").toString();
+            searchQuery.userRole = aeroSpikeRecord.bins.get("userRole").toString();
+            searchQuery.timePerformed = LocalDateTime.parse(aeroSpikeRecord.bins.get("timePerformed").toString());
+            searchQuery.clientId = Long.parseLong(aeroSpikeRecord.bins.get("clientId").toString());
+            searchQuery.sessionId = aeroSpikeRecord.bins.get("sessionId").toString();
             return searchQuery;
         } catch (Exception e) {
             throw new DbException(e.getLocalizedMessage());

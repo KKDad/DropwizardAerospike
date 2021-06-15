@@ -5,29 +5,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.List;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Anonymizer {
-
-    @JsonProperty("type")
-    public String type;
-
-    @JsonProperty("new_value")
-    public String newValue;
-
-    @JsonProperty("masking_char")
-    public String maskingChar;
-
-    @JsonProperty("chars_to_mask")
-    public Integer charsToMask;
-
-    @JsonProperty("from_end")
-    public Boolean fromEnd;
-
-    @JsonProperty("operator")
-    public String operator;
-
+public class AnonymizeResult {
     @JsonProperty("text")
     public String text;
+
+    @JsonProperty("items")
+    public List<AnonymizedItem> items;
 
     @Override
     public String toString() {

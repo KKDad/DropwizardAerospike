@@ -2,10 +2,6 @@ package com.ceridian.search.configuration;
 
 import com.aerospike.client.AerospikeClient;
 import com.aerospike.client.Info;
-import com.aerospike.client.policy.AuthMode;
-import com.aerospike.client.policy.Policy;
-import com.aerospike.client.policy.TlsPolicy;
-import com.aerospike.client.policy.WritePolicy;
 import com.ceridian.search.aerospike.DbException;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -33,22 +29,16 @@ public class AerospikeConfiguration {
     @JsonProperty("bucket")
     public String bucket;
 
-//    public AuthMode authMode;
-//    public TlsPolicy tlsPolicy;
-//    public WritePolicy writePolicy;
-//    public Policy policy;
-
     boolean singleBin;
     boolean hasGeo;
     boolean hasUdf;
     boolean hasCDTList;
     boolean hasCDTMap;
 
-    public AerospikeConfiguration() {}
-
     /**
      * Some database calls need to know how the server is configured.
      */
+    @SuppressWarnings("java:S131")
     public void setServerSpecific(AerospikeClient client) throws DbException {
         var node = client.getNodes()[0];
         var featuresFilter = "features";

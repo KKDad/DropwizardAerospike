@@ -35,11 +35,7 @@ public class SearchAnonymizerAPI extends Application<SearchAnonymizerConfigurati
         var policy = new ClientPolicy();
         policy.user = configuration.aerospike.user;
         policy.password = configuration.aerospike.password;
-//        policy.authMode = configuration.aerospike.authMode;
-//        policy.tlsPolicy = configuration.aerospike.tlsPolicy;
-//
-//        configuration.aerospike.policy = policy.readPolicyDefault;
-//        configuration.aerospike.writePolicy = policy.writePolicyDefault;
+        LOG.info("Using Aerospike cluster at: {}:{}", configuration.aerospike.host, configuration.aerospike.port);
 
         Host[] hosts = Host.parseHosts(configuration.aerospike.host, configuration.aerospike.port);
         var client = new AerospikeClient(policy, hosts);
@@ -47,7 +43,7 @@ public class SearchAnonymizerAPI extends Application<SearchAnonymizerConfigurati
 
 
         // === Register API Handlers
-        final SearchDao searchDao = new SearchDao(client, configuration.aerospike);
+        final var searchDao = new SearchDao(client, configuration.aerospike);
         environment.jersey().register(new SearchRecorder(searchDao));
     }
 
