@@ -11,3 +11,11 @@ logging:
     com.aerospike.jdbc: WARN
   appenders:
     - type: console
+
+presidio:
+  analyzer:
+    host: 127.0.0.1
+    port: 5001
+  anonymizer:
+    host: 127.0.0.1
+    port: 5001
