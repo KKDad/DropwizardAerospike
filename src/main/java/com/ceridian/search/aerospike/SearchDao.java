@@ -4,6 +4,7 @@ import com.aerospike.client.AerospikeClient;
 import com.aerospike.client.Bin;
 import com.aerospike.client.Key;
 import com.ceridian.search.configuration.AerospikeConfiguration;
+import com.ceridian.search.configuration.SearchRecorderConfiguration;
 import com.ceridian.search.models.SearchQueryAnonymized;
 
 import java.time.LocalDateTime;
@@ -13,10 +14,12 @@ public class SearchDao implements ISearchDao {
 
     private final AerospikeClient client;
     private final AerospikeConfiguration params;
+    private final SearchRecorderConfiguration config;
 
-    public SearchDao(AerospikeClient client, AerospikeConfiguration params) {
+    public SearchDao(AerospikeClient client, AerospikeConfiguration params, SearchRecorderConfiguration config) {
         this.client = client;
         this.params = params;
+        this.config = config;
     }
 
     @Override

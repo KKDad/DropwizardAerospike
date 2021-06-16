@@ -20,3 +20,11 @@ presidio:
   anonymizer:
     host: 127.0.0.1
     port: 5002
+
+recorder:
+  anonyimized:
+    enabled: true
+    namespace: test
+  raw:
+    enabled: false
+    namespace: rawRecords

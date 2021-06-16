@@ -2,7 +2,7 @@ package com.ceridian.search.configuration;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class AnalyzerConfiguration {
+public class PresidioAnalyzerConfiguration {
     @JsonProperty("host")
     public String host;
 

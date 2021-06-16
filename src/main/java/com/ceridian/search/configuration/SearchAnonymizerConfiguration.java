@@ -10,4 +10,7 @@ public class SearchAnonymizerConfiguration extends Configuration {
 
     @JsonProperty("presidio")
     public PresidioConfiguration presido;
+
+    @JsonProperty("recorder")
+    public SearchRecorderConfiguration recorder;
 }

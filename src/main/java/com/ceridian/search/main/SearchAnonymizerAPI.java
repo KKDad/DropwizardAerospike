@@ -41,9 +41,8 @@ public class SearchAnonymizerAPI extends Application<SearchAnonymizerConfigurati
         var client = new AerospikeClient(policy, hosts);
         configuration.aerospike.setServerSpecific(client);
 
-
         // === Register API Handlers
-        final var searchDao = new SearchDao(client, configuration.aerospike);
+        final var searchDao = new SearchDao(client, configuration.aerospike, configuration.recorder);
         environment.jersey().register(new SearchRecorder(searchDao));
     }
 

@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class PresidioConfiguration {
 
     @JsonProperty("analyzer")
-    public AnalyzerConfiguration analyzer;
+    public PresidioAnalyzerConfiguration analyzer;
 
     @JsonProperty("anonymizer")
-    public  AnonymizerConfiguration anonymizer;
+    public PresidioAnonymizerConfiguration anonymizer;
 }

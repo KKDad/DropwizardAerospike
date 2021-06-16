@@ -34,6 +34,12 @@ public class Anonymizer {
             LOG.trace("No PII detected in input string");
             processed = input;
         } else {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Processed: {}", input);
+                LOG.debug("Detected:");
+                for (AnalyzedItem item : results)
+                    LOG.debug("  -> {}", item);
+            }
             AnonymizeResult result = doPresidoAnonymize(input, results);
             processed = result.text;
         }
